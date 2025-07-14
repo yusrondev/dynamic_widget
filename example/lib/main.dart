@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_widget/dynamic_widget.dart';
 import 'package:dynamic_widget/dynamic_widget/basic/dynamic_widget_json_exportor.dart';
-import 'widget_json.dart'; // berisi listviewJson
 
 void main() => runApp(MyApp());
 
@@ -14,44 +13,40 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue),
       home: PreviewPage('''
 {
-  "type": "Scaffold",
-  "appBar": {
-    "type": "AppBar",
-    "centerTitle": true,
-    "backgroundColor": "#e1e1e1",
-    "title": {
-      "type": "Text",
-      "data": "Dynamic Title",
-      "style": {
-        "color": "61000000",
-        "fontSize": 20,
-        "fontWeight": "normal"
+  "type": "ListView",
+  "children": [
+    {
+      "type": "Container",
+      "height": 100,
+      "child": {
+        "type": "Stack",
+        "alignment": "topLeft",
+        "children": [
+          {
+            "type": "Positioned",
+            "top": 0,
+            "left": 0,
+            "child": {
+              "type": "Text",
+              "data": "Item 1"
+            }
+          },
+          {
+            "type": "Positioned",
+            "top": 20,
+            "left": 0,
+            "child": {
+              "type": "Text",
+              "data": "Item 2"
+            }
+          }
+        ]
       }
     }
-  },
-  "body": {
-    "type": "Text",
-    "data": "Hello World",
-    "style": {}
-  },
-  "bottomNavigationBar": {
-    "type": "BottomNavigationBar",
-    "backgroundColor": "#FFFFFF",
-    "currentIndex": 0,
-    "items": [
-      {
-        "type": "BottomNavigationBarItem",
-        "label": "Item",
-        "icon": {
-          "type": "Icon",
-          "codePoint": 59530,
-          "fontFamily": "MaterialIcons"
-        }
-      }
-    ]
-  }
+  ]
 }
-'''),
+
+'''), // ← JSON hanya isi body
     );
   }
 }
@@ -59,10 +54,9 @@ class MyApp extends StatelessWidget {
 // ignore: must_be_immutable
 class PreviewPage extends StatelessWidget {
   final String jsonString;
+  DynamicWidgetJsonExportor? _exportor;
 
   PreviewPage(this.jsonString);
-
-  DynamicWidgetJsonExportor? _exportor;
 
   Future<Widget?> _buildWidget(BuildContext context) async {
     return DynamicWidgetBuilder.build(
@@ -90,11 +84,37 @@ class PreviewPage extends StatelessWidget {
         }
 
         _exportor = DynamicWidgetJsonExportor(child: snapshot.data!);
-        return _exportor!;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Preview'),
+            backgroundColor: Colors.blue,
+          ),
+          body: _exportor,
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: 0,
+            onTap: (index) {
+              // Ganti tab di sini
+            },
+            selectedItemColor: Colors.blue,
+            unselectedItemColor: Colors.grey,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+            ],
+          ),
+        );
       },
     );
   }
 }
+
 class DefaultClickListener implements ClickListener {
   @override
   void onClicked(String? event) {
